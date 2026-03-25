@@ -1,0 +1,73 @@
+<!-- Vista: dashboard vendedor — inyectada en #vistaContenido -->
+<div class="dash-wrapper vista-fade">
+
+    <div>
+        <h2 class="dash-titulo">Mi Dashboard</h2>
+        <p id="dash-fecha" class="dash-fecha"></p>
+    </div>
+
+    <!-- 3 tarjetas: Ventas Hoy, Stock, Actividad -->
+    <div class="dash-stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))">
+
+        <div class="stat-card dash-stat-item">
+            <div class="dash-stat-top">
+                <div class="dash-stat-icon dash-icon-verde">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <span id="stat-ventas-hoy-badge" class="dash-badge dash-badge-verde"></span>
+            </div>
+            <p class="stat-label">Mis Ventas Hoy</p>
+            <p class="stat-num" id="stat-ventas-hoy"></p>
+            <a href="#" class="dash-link" data-vista="ventas">
+                Ir a ventas <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="stat-card dash-stat-item">
+            <div class="dash-stat-top">
+                <div class="dash-stat-icon dash-icon-naranja">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <span id="stat-inventario-badge" class="dash-badge dash-badge-naranja"></span>
+            </div>
+            <p class="stat-label">Inventario</p>
+            <p class="stat-num" id="stat-inventario"></p>
+            <a href="#" class="dash-link" data-vista="inventario">
+                Ver inventario <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Stock + Actividad -->
+    <div class="dash-mid-grid">
+
+        <div class="stat-card dash-panel">
+            <h6 class="dash-panel-titulo">
+                <i class="fas fa-exclamation-circle dash-icon-warning"></i>
+                Estado de Stock
+            </h6>
+            <div id="stock-lista">
+                <div class="dash-skeleton"></div>
+                <div class="dash-skeleton" style="width:80%"></div>
+                <div class="dash-skeleton" style="width:65%"></div>
+            </div>
+        </div>
+
+        <div class="stat-card dash-panel">
+            <h6 class="dash-panel-titulo">
+                <i class="fas fa-history dash-icon-azul-txt"></i>
+                Mi Actividad Reciente
+            </h6>
+            <div id="actividad-lista"></div>
+        </div>
+
+    </div>
+
+    <!-- Mis ventas recientes -->
+    <div class="stat-card dash-panel">
+        <h5 class="dash-seccion-titulo">Mis Ventas Recientes</h5>
+        <div id="ventas-lista"></div>
+    </div>
+
+</div>

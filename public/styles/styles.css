@@ -1,0 +1,135 @@
+/* ── Design Tokens ─────────────────────────────────── */
+:root {
+    --color-pri:  #0a335b;
+    --color-sec:  #0b3661;
+    --color-ter:  #F1F1F1;
+    --color-cua:  #D0DCE5;
+    --color-qui:  #004F99;
+}
+
+/* ── Fondos ────────────────────────────────────────── */
+.colorPri  { background: var(--color-pri);  }
+.colorSec  { background: var(--color-sec);  }
+.colorTer  { background: var(--color-ter);  }
+.colorCua  { background: var(--color-cua);  }
+.colorQui  { background: var(--color-qui);  }
+.colorSext { background: #0a347c94;         }
+
+/* ── Textos ────────────────────────────────────────── */
+.colorTextAz   { color: var(--color-sec); }
+.colorTextBlan { color: #ffffff; }
+
+/* ── Utilidades ────────────────────────────────────── */
+.Redondear { border-radius: 10px; }
+
+/* ── Navbar ────────────────────────────────────────── */
+.nav-link-custom {
+    color: rgba(255, 255, 255, 0.90) !important;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+.nav-link-custom:hover {
+    color: #ffffff !important;
+}
+.nav-link-custom.active,
+.nav-item.active .nav-link-custom {
+    color: #ffffff !important;
+    font-weight: 700;
+}
+
+/* ── Hero ──────────────────────────────────────────── */
+.jumbotron { padding: 3rem 1rem; }
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+.hero-titulo    { animation: fadeUp 0.6s ease forwards; }
+.hero-subtitulo { animation: fadeUp 0.6s ease 0.2s forwards; opacity: 0; }
+.hero-btn       { animation: fadeUp 0.6s ease 0.4s forwards; opacity: 0; }
+
+/* ── Stats ─────────────────────────────────────────── */
+.stats-img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+}
+
+/* ── Íconos responsive ─────────────────────────────── */
+.iconoAzul        { color: #0d2f6e !important; }
+.icono-responsive { font-size: 3rem; }
+@media (min-width: 768px) { .icono-responsive { font-size: 4rem; } }
+@media (min-width: 992px) { .icono-responsive { font-size: 5rem; } }
+
+/* ── Logo navbar ───────────────────────────────────── */
+.nav-logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+/* ── Iniciar Sesión ────────────────────────────────── */
+.nav-login {
+    color: rgba(255, 255, 255, 0.70);
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+    text-decoration: none;
+}
+.nav-login:hover {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+/* ── Cards ─────────────────────────────────────────── */
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* ── Cards de funciones.html ───────────────────────── */
+.borde {
+    border-radius: 10px;
+    border: 3px solid #ccc;
+}
+
+/* ── Separador de funciones.html ───────────────────── */
+.grosor {
+    border: none;
+    border-top: 4px solid #ccc;
+}
+
+/* ── Login ─────────────────────────────────────────── */
+body.login-page {
+    background: #f4f6f8;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.auth-wrapper {
+    max-width: 460px;
+    width: 100%;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+.auth-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+.logo-box {
+    display: inline-block;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    background: var(--color-pri);
+}
+.logo-login {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+}

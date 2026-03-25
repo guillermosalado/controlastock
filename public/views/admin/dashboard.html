@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - ControlaStock</title>
+    <link rel="icon" type="image/jpg" sizes="32x32" href="/img/logo.jpg">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css"
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/sidebar.css">
+    <link rel="stylesheet" href="/styles/dashboard.css">
+</head>
+<body>
+    <div class="sb-overlay-mobile" id="sbOverlay"></div>
+
+    <!-- ══ TOPBAR MOBILE ════════════════════════════════ -->
+    <div class="topbar-mobile">
+        <button class="hamburger-btn" id="hamburger">
+            <span></span><span></span><span></span>
+        </button>
+        <span class="topbar-brand-mobile">ControlaStock</span>
+        <button class="topbar-logout-mobile" id="btnCerrarSesionMobile" title="Cerrar sesión">
+            <i class="fas fa-sign-out-alt"></i>
+        </button>
+        <div class="topbar-avatar" id="topbar-avatar-mobile"
+             style="background:#304270;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;border-radius:50%;width:30px;height:30px">
+            —
+        </div>
+    </div>
+
+    <!-- ══ SIDEBAR ══════════════════════════════════════ -->
+    <aside class="sidebar-admin" id="sidebarAdmin">
+        <div class="sidebar-header">
+            <i class="fas fa-boxes sidebar-logo-icon"></i>
+            <div class="sidebar-brand-text">
+                <h2>ControlaStock</h2>
+                <span>Sistema de inventario</span>
+            </div>
+        </div>
+        <div class="sidebar-profile">
+            <div class="profile-avatar" id="sidebar-avatar"
+                 style="background:#304270;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;border-radius:50%;width:32px;height:32px;flex-shrink:0">
+                —
+            </div>
+            <div class="profile-info">
+                <strong id="sb-nombre">—</strong>
+                <span id="sb-rol">—</span>
+            </div>
+        </div>
+        <div class="sidebar-section-label">
+            <div class="section-line"></div>
+            <span class="section-text">Menú</span>
+            <div class="section-line"></div>
+        </div>
+        <ul class="sidebar-links" id="menuNav"></ul>
+        <div class="sidebar-logout-wrap">
+            <button class="sidebar-logout-btn" id="btnCerrarSesion">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar sesión</span>
+            </button>
+        </div>
+        <button class="sidebar-toggle-btn" id="sidebarToggle">
+            <i class="fas fa-chevron-left" id="toggleIcon"></i>
+        </button>
+    </aside>
+
+    <!-- ══ CONTENIDO PRINCIPAL ══════════════════════════ -->
+    <div class="contenido-admin" id="contenidoAdmin">
+        <nav class="topbar-desktop">
+            <span class="topbar-tienda">
+                <i class="fas fa-store"></i> Tienda: <span id="tb-tienda">—</span>
+            </span>
+            <div class="topbar-acciones">
+                <div class="topbar-usuario">
+                    <div class="topbar-avatar-img" id="topbar-avatar-desktop"
+                         style="background:#304270;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;border-radius:50%;width:36px;height:36px;flex-shrink:0;border:2px solid #304270">
+                        —
+                    </div>
+                    <div class="topbar-usuario-info">
+                        <p class="topbar-usuario-nombre" id="tb-nombre">—</p>
+                        <p class="topbar-usuario-email" id="tb-email">—</p>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <main id="vistaContenido" class="vista-fade"></main>
+    </div>
+
+    <script type="module" src="/js/controllers/authGuard.js"></script>
+    <script src="/js/router.js"></script>
+    <script type="module" src="/js/controllers/sidebarController.js"></script>
+    <script src="/js/controllers/dashboardController.js"></script>
+    <script src="/js/controllers/usuariosController.js"></script>
+    <script src="/js/controllers/proveedoresController.js"></script>
+    <script src="/js/controllers/inventarioController.js"></script>
+    <script src="/js/controllers/ventasController.js"></script>
+</body>
+</html>

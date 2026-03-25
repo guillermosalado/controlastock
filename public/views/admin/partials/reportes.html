@@ -1,0 +1,352 @@
+<!-- ══════════════════════════════════════════════════════
+     vista: reportes.html  →  /views/shared/reportes.html
+     Inyectada en: #vistaContenido
+     ══════════════════════════════════════════════════════ -->
+
+<div class="dash-wrapper vista-fade">
+
+    <!-- ── Encabezado ──────────────────────────────────── -->
+    <div class="dash-vista-header">
+        <div>
+            <h2 class="dash-titulo">Reportes</h2>
+            <p class="dash-fecha" id="rep-subtitulo">Resumen de operaciones</p>
+        </div>
+        <!-- Selector de fecha global -->
+        <div style="display:flex;gap:.5rem;align-items:center">
+            <input type="date" id="rep-fecha-global" class="usu-input"
+                   style="width:160px" title="Fecha del reporte diario">
+            <button class="btn-inv-movimientos" id="btnRefrescarReportes">
+                <i class="fas fa-sync-alt"></i> Actualizar
+            </button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         SECCIÓN 1 — Resumen del día
+    ══════════════════════════════════════════════════════ -->
+    <div style="margin-bottom:1.25rem">
+        <h3 style="font-size:1rem;font-weight:700;color:#1a2340;margin:0 0 .75rem">
+            <i class="fas fa-calendar-day" style="color:var(--color-pri);margin-right:.4rem"></i>
+            Resumen del día
+        </h3>
+
+        <!-- Tarjetas KPI -->
+        <div id="rep-kpi-grid"
+             style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem">
+            <!-- skeleton -->
+            <div class="stat-card rep-kpi-skeleton">
+                <div class="dash-skeleton" style="height:18px;width:60%;margin-bottom:.5rem"></div>
+                <div class="dash-skeleton" style="height:32px;width:80%"></div>
+            </div>
+            <div class="stat-card rep-kpi-skeleton">
+                <div class="dash-skeleton" style="height:18px;width:60%;margin-bottom:.5rem"></div>
+                <div class="dash-skeleton" style="height:32px;width:80%"></div>
+            </div>
+            <div class="stat-card rep-kpi-skeleton">
+                <div class="dash-skeleton" style="height:18px;width:60%;margin-bottom:.5rem"></div>
+                <div class="dash-skeleton" style="height:32px;width:80%"></div>
+            </div>
+            <div class="stat-card rep-kpi-skeleton">
+                <div class="dash-skeleton" style="height:18px;width:60%;margin-bottom:.5rem"></div>
+                <div class="dash-skeleton" style="height:32px;width:80%"></div>
+            </div>
+        </div>
+
+        <!-- Desglose métodos de pago -->
+        <div class="stat-card" style="margin-top:1rem;padding:1rem 1.4rem">
+            <p style="font-size:.82rem;font-weight:700;color:#7a8a9a;
+                      text-transform:uppercase;letter-spacing:.05em;margin:0 0 .6rem">
+                Desglose por método de pago
+            </p>
+            <div id="rep-metodos-wrap">
+                <div class="dash-skeleton" style="height:16px;width:40%;margin-bottom:.4rem"></div>
+                <div class="dash-skeleton" style="height:16px;width:55%;margin-bottom:.4rem"></div>
+                <div class="dash-skeleton" style="height:16px;width:30%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         SECCIÓN 3 — Stock bajo
+    ══════════════════════════════════════════════════════ -->
+    <div>
+        <h3 style="font-size:1rem;font-weight:700;color:#1a2340;margin:0 0 .75rem">
+            <i class="fas fa-exclamation-triangle" style="color:#dc3545;margin-right:.4rem"></i>
+            Alertas de stock bajo
+            <span id="rep-stock-badge"
+                  style="display:inline-block;background:#dc3545;color:#fff;
+                         font-size:.7rem;padding:.1rem .5rem;border-radius:99px;
+                         vertical-align:middle;margin-left:.4rem">…</span>
+        </h3>
+
+        <div class="stat-card dash-panel">
+            <div id="rep-stock-skeleton">
+                <div class="dash-skeleton"></div>
+                <div class="dash-skeleton" style="width:75%"></div>
+                <div class="dash-skeleton" style="width:55%"></div>
+            </div>
+            <div id="rep-stock-tabla" style="display:none">
+                <div class="usu-table-wrapper">
+                    <table class="usu-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Proveedor</th>
+                                <th style="text-align:center">Stock actual</th>
+                                <th style="text-align:center">Mínimo</th>
+                                <th style="text-align:center">Déficit</th>
+                                <th style="text-align:right">Precio venta</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rep-stock-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <p id="rep-stock-vacio"
+               style="display:none;color:#28a745;text-align:center;padding:2rem">
+                <i class="fas fa-check-circle" style="margin-right:.4rem"></i>
+                ¡Todo el stock está en niveles correctos!
+            </p>
+        </div>
+    </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     CONTROLLER JS — reportes
+══════════════════════════════════════════════════════ -->
+<script>
+(function initReportes() {
+    if (!document.getElementById('rep-kpi-grid')) return;
+
+    const token = localStorage.getItem('token');
+
+    // ── Helpers ───────────────────────────────────────────
+    async function api(url) {
+        const res  = await fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept':        'application/json',
+            },
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Error');
+        return json;
+    }
+
+    function formatMXN(val) {
+        return Number(val).toLocaleString('es-MX', {
+            style: 'currency', currency: 'MXN',
+        });
+    }
+
+    function hoy() {
+        return new Date().toISOString().split('T')[0];
+    }
+
+    // Poner fecha de hoy por defecto
+    document.getElementById('rep-fecha-global').value = hoy();
+
+    // ── KPI helpers ───────────────────────────────────────
+    function kpiCard({ icon, iconColor, label, value, sub }) {
+        return `
+            <div class="stat-card" style="padding:1rem 1.2rem">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                    <div>
+                        <p style="margin:0;font-size:.78rem;font-weight:600;color:#7a8a9a;
+                                  text-transform:uppercase;letter-spacing:.05em">${label}</p>
+                        <p style="margin:.3rem 0 0;font-size:1.6rem;font-weight:800;
+                                  color:#1a2340;line-height:1">${value}</p>
+                        ${sub ? `<p style="margin:.3rem 0 0;font-size:.78rem;color:#7a8a9a">${sub}</p>` : ''}
+                    </div>
+                    <div style="width:42px;height:42px;border-radius:10px;
+                                background:${iconColor}18;display:flex;
+                                align-items:center;justify-content:center">
+                        <i class="${icon}" style="color:${iconColor};font-size:1.1rem"></i>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // ════════════════════════════════════════════════════
+    // RESUMEN DEL DÍA
+    // ════════════════════════════════════════════════════
+    async function cargarResumenDia() {
+        const fecha = document.getElementById('rep-fecha-global').value || hoy();
+
+        // Mostrar skeletons
+        document.getElementById('rep-kpi-grid').innerHTML = `
+            ${[1,2,3,4].map(() => `
+                <div class="stat-card">
+                    <div class="dash-skeleton" style="height:18px;width:60%;margin-bottom:.5rem"></div>
+                    <div class="dash-skeleton" style="height:32px;width:80%"></div>
+                </div>
+            `).join('')}
+        `;
+        document.getElementById('rep-metodos-wrap').innerHTML = `
+            <div class="dash-skeleton" style="height:16px;width:40%;margin-bottom:.4rem"></div>
+            <div class="dash-skeleton" style="height:16px;width:55%;margin-bottom:.4rem"></div>
+        `;
+
+        try {
+            const resp = await api(`/api/reportes/resumen-dia?fecha=${fecha}`);
+            const { resumen, venta_top, metodos } = resp.data;
+
+            const r = resumen || {};
+
+            document.getElementById('rep-kpi-grid').innerHTML = `
+                ${kpiCard({
+                    icon: 'fas fa-dollar-sign', iconColor: '#28a745',
+                    label: 'Ingresos del día',
+                    value: formatMXN(r.ingresos_totales || 0),
+                    sub: fecha === hoy() ? 'Hoy' : fecha,
+                })}
+                ${kpiCard({
+                    icon: 'fas fa-shopping-bag', iconColor: 'var(--color-pri)',
+                    label: 'Ventas completadas',
+                    value: r.ventas_completadas || 0,
+                    sub: `${r.total_transacciones || 0} transacciones`,
+                })}
+                ${kpiCard({
+                    icon: 'fas fa-ban', iconColor: '#dc3545',
+                    label: 'Ventas canceladas',
+                    value: r.ventas_canceladas || 0,
+                    sub: r.descuentos_otorgados > 0
+                        ? `Desc: ${formatMXN(r.descuentos_otorgados)}`
+                        : 'Sin descuentos',
+                })}
+                ${kpiCard({
+                    icon: 'fas fa-star', iconColor: '#f59e0b',
+                    label: 'Venta más alta',
+                    value: venta_top ? formatMXN(venta_top.total) : '—',
+                    sub: venta_top ? venta_top.folio : 'Sin ventas',
+                })}
+            `;
+
+            // Métodos de pago
+            const iconMetodo = {
+                efectivo:      '<i class="fas fa-money-bill-wave"></i>',
+                tarjeta:       '<i class="fas fa-credit-card"></i>',
+                transferencia: '<i class="fas fa-university"></i>',
+            };
+
+            if (!metodos.length) {
+                document.getElementById('rep-metodos-wrap').innerHTML =
+                    '<p style="color:#7a8a9a;font-size:.85rem;margin:0">Sin ventas en esta fecha.</p>';
+            } else {
+                document.getElementById('rep-metodos-wrap').innerHTML = metodos.map(m => `
+                    <div style="display:flex;justify-content:space-between;align-items:center;
+                                padding:.4rem 0;border-bottom:1px solid #f0f4f8;font-size:.88rem">
+                        <span style="display:flex;align-items:center;gap:.5rem;color:#1a2340">
+                            ${iconMetodo[m.metodo_pago] || ''}
+                            <span style="text-transform:capitalize">${m.metodo_pago}</span>
+                            <span style="color:#7a8a9a;font-size:.78rem">${m.cantidad} venta(s)</span>
+                        </span>
+                        <span style="font-weight:700;color:var(--color-pri)">${formatMXN(m.total)}</span>
+                    </div>
+                `).join('');
+            }
+
+        } catch (err) {
+            console.error('Error resumen día:', err);
+            document.getElementById('rep-kpi-grid').innerHTML =
+                '<p style="color:#dc3545;font-size:.85rem">Error al cargar resumen.</p>';
+        }
+    }
+
+    // ════════════════════════════════════════════════════
+    // STOCK BAJO
+    // ════════════════════════════════════════════════════
+    async function cargarStockBajo() {
+        const skeleton = document.getElementById('rep-stock-skeleton');
+        const tabla    = document.getElementById('rep-stock-tabla');
+        const vacio    = document.getElementById('rep-stock-vacio');
+        const badge    = document.getElementById('rep-stock-badge');
+
+        skeleton.style.display = 'block';
+        tabla.style.display    = 'none';
+        vacio.style.display    = 'none';
+
+        try {
+            const resp     = await api('/api/reportes/stock-bajo');
+            const productos = resp.data;
+
+            skeleton.style.display = 'none';
+            badge.textContent      = productos.length;
+
+            if (!productos.length) {
+                badge.style.background = '#28a745';
+                vacio.style.display    = 'block';
+                return;
+            }
+
+            badge.style.background = '#dc3545';
+
+            document.getElementById('rep-stock-tbody').innerHTML = productos.map(p => {
+                const deficit   = p.stock_minimo - p.stock_actual;
+                const critico   = p.stock_actual === 0;
+                const colorFila = critico ? 'background:#fff5f5' : '';
+
+                return `
+                    <tr style="${colorFila}">
+                        <td>
+                            <span style="font-weight:600;font-size:.9rem">${p.producto}</span>
+                            ${p.codigo_barras
+                                ? `<span style="display:block;font-size:.75rem;color:#7a8a9a">
+                                       ${p.codigo_barras}
+                                   </span>`
+                                : ''}
+                        </td>
+                        <td>
+                            <span style="font-size:.8rem;background:#f0f4f8;
+                                         padding:.15rem .5rem;border-radius:99px;color:#5a6a7a">
+                                ${p.categoria}
+                            </span>
+                        </td>
+                        <td style="font-size:.85rem;color:#5a6a7a">
+                            ${p.proveedor || '—'}
+                        </td>
+                        <td style="text-align:center">
+                            <span style="font-weight:800;font-size:1rem;
+                                         color:${critico ? '#dc3545' : '#f59e0b'}">
+                                ${p.stock_actual}
+                                ${critico
+                                    ? '<i class="fas fa-times-circle" style="margin-left:.2rem"></i>'
+                                    : '<i class="fas fa-exclamation-circle" style="margin-left:.2rem"></i>'}
+                            </span>
+                        </td>
+                        <td style="text-align:center;color:#7a8a9a">${p.stock_minimo}</td>
+                        <td style="text-align:center">
+                            <span style="font-weight:700;color:#dc3545">−${deficit}</span>
+                        </td>
+                        <td style="text-align:right;font-weight:600">
+                            ${formatMXN(p.precio_venta)}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            tabla.style.display = 'block';
+
+        } catch (err) {
+            console.error('Error stock bajo:', err);
+            skeleton.style.display = 'none';
+        }
+    }
+
+    // ── Cargar todo ───────────────────────────────────────
+    function cargarTodo() {
+        cargarResumenDia();
+        cargarStockBajo();
+    }
+
+    // ── Eventos ───────────────────────────────────────────
+    document.getElementById('btnRefrescarReportes')
+        ?.addEventListener('click', cargarTodo);
+
+    // ── Arrancar ──────────────────────────────────────────
+    cargarTodo();
+})();
+</script>

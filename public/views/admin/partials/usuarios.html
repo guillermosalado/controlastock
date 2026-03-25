@@ -1,0 +1,123 @@
+<!-- ══════════════════════════════════════════════════════
+     vista: usuarios.html
+     Inyectada en: #vistaContenido
+     Datos: usuariosController.js  (cargado en index.html)
+     ══════════════════════════════════════════════════════ -->
+
+<div class="dash-wrapper vista-fade">
+
+    <!-- ── Encabezado ──────────────────────────────────── -->
+    <div class="dash-vista-header">
+        <div>
+            <h2 class="dash-titulo">Usuarios</h2>
+            <p class="dash-fecha">Gestión de usuarios de tu tienda</p>
+        </div>
+        <button class="btn-nuevo-usuario" id="btnNuevoUsuario">
+            <i class="fas fa-user-plus"></i>
+            Nuevo usuario
+        </button>
+    </div>
+
+    <!-- ── Tabla usuarios ───────────────────────────────── -->
+    <div class="stat-card dash-panel">
+        <div id="usuarios-skeleton">
+            <div class="dash-skeleton"></div>
+            <div class="dash-skeleton" style="width:90%"></div>
+            <div class="dash-skeleton" style="width:75%"></div>
+        </div>
+        <div id="usuarios-tabla" style="display:none">
+            <div class="usu-table-wrapper">
+                <table class="usu-table">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Correo</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usuarios-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+        <p id="usuarios-vacio" style="display:none;color:#7a8a9a;text-align:center;padding:2rem">
+            No hay usuarios registrados aún.
+        </p>
+    </div>
+
+</div>
+
+<!-- ══ MODAL — Crear / Editar usuario ══════════════════ -->
+<div class="usu-modal-overlay" id="usuModal" style="display:none">
+    <div class="usu-modal-card">
+        <div class="usu-modal-header">
+            <h5 class="usu-modal-titulo" id="modalTitulo">Nuevo usuario</h5>
+            <button class="usu-modal-close" id="btnCerrarModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="usu-modal-body">
+            <div class="usu-form-row">
+                <div class="usu-form-group">
+                    <label>Nombre</label>
+                    <input type="text" id="inp-nombre" class="usu-input" placeholder="Nombre" required>
+                </div>
+                <div class="usu-form-group">
+                    <label>Apellidos</label>
+                    <input type="text" id="inp-apellidos" class="usu-input" placeholder="Apellidos" required>
+                </div>
+            </div>
+            <div class="usu-form-group">
+                <label>Correo electrónico</label>
+                <input type="email" id="inp-email" class="usu-input" placeholder="correo@ejemplo.com" required>
+            </div>
+            <div class="usu-form-group">
+                <label>Rol</label>
+                <select id="inp-rol" class="usu-input">
+                    <option value="2">Vendedor</option>
+                    <option value="1">Administrador</option>
+                </select>
+            </div>
+            <div class="usu-form-group" id="grupo-password">
+                <label>Contraseña</label>
+                <input type="password" id="inp-password" class="usu-input" placeholder="Mínimo 6 caracteres">
+            </div>
+            <p id="modal-error" style="display:none;color:#dc3545;font-size:.85rem;margin-top:.5rem"></p>
+        </div>
+        <div class="usu-modal-footer">
+            <button class="usu-btn-cancelar" id="btnCancelarModal">Cancelar</button>
+            <button class="usu-btn-guardar" id="btnGuardarModal">
+                <i class="fas fa-save"></i> Guardar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ MODAL — Cambiar contraseña ══════════════════════ -->
+<div class="usu-modal-overlay" id="modalPassword" style="display:none">
+    <div class="usu-modal-card" style="max-width:400px">
+        <div class="usu-modal-header">
+            <h5 class="usu-modal-titulo">Cambiar contraseña</h5>
+            <button class="usu-modal-close" id="btnCerrarModalPwd">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="usu-modal-body">
+            <div class="usu-form-group">
+                <label>Nueva contraseña</label>
+                <input type="password" id="inp-nueva-password" class="usu-input" placeholder="Mínimo 6 caracteres">
+            </div>
+            <p id="pwd-error" style="display:none;color:#dc3545;font-size:.85rem;margin-top:.5rem"></p>
+        </div>
+        <div class="usu-modal-footer">
+            <button class="usu-btn-cancelar" id="btnCancelarModalPwd">Cancelar</button>
+            <button class="usu-btn-guardar" id="btnGuardarPwd">
+                <i class="fas fa-key"></i> Actualizar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- El controller está cargado globalmente en index.html -->
+<script>initUsuarios();</script>

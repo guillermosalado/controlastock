@@ -1,0 +1,15 @@
+.git
+.env
+*.md
+docs/
+vendor/
+node_modules/
+storage/logs/*
+database/database.sqlite
+tests/
+.editorconfig
+.gitattributes
+phpunit.xml
+vite.config.js
+package.json
+package-lock.json

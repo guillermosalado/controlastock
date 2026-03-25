@@ -1,0 +1,22 @@
+# ─────────────────────────────────────────────
+#  Bloquear acceso a archivos sensibles
+# ─────────────────────────────────────────────
+
+<FilesMatch "^(\.env|\.git|\.htaccess|composer\.(json|lock)|package\.json|package-lock\.json|yarn\.lock|vite\.config\.js|artisan)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# ─────────────────────────────────────────────
+#  Reglas de reescritura
+# ─────────────────────────────────────────────
+
+RewriteEngine On
+
+RewriteRule ^(storage|bootstrap/cache|vendor|node_modules)/ - [F,L]
+
+# ─────────────────────────────────────────────
+#  Evitar listado de directorios
+# ─────────────────────────────────────────────
+
+Options -Indexes

@@ -1,0 +1,298 @@
+<!-- ══════════════════════════════════════════════════════
+     vista: inventario.html  →  /views/shared/inventario.html
+     Inyectada en: #vistaContenido
+     Datos: inventarioController.js (cargado en index.html)
+     ══════════════════════════════════════════════════════ -->
+
+<div class="dash-wrapper vista-fade">
+
+    <!-- ── Encabezado ──────────────────────────────────── -->
+    <div class="dash-vista-header">
+        <div>
+            <h2 class="dash-titulo">Inventario</h2>
+            <p class="dash-fecha" id="inv-subtitulo">Gestión de productos</p>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+            <button class="btn-inv-movimientos inv-solo-admin" id="btnGestionCategorias" style="display:none">
+                <i class="fas fa-tags"></i> Categorías
+            </button>
+            <button class="btn-nuevo-usuario inv-solo-admin" id="btnNuevoProducto" style="display:none">
+                <i class="fas fa-plus"></i> Nuevo producto
+            </button>
+            <button class="btn-inv-movimientos" id="btnVerMovimientos">
+                <i class="fas fa-history"></i> Movimientos
+            </button>
+        </div>
+    </div>
+
+    <!-- ── Filtros ──────────────────────────────────────── -->
+    <div class="inv-filtros stat-card" style="padding:1rem 1.4rem">
+        <div class="inv-filtros-row">
+            <div class="inv-search-wrap">
+                <i class="fas fa-search inv-search-icon"></i>
+                <input type="text" id="inv-buscar" class="usu-input inv-search-input"
+                       placeholder="Buscar producto, código...">
+            </div>
+            <select id="inv-filtro-categoria" class="usu-input inv-select">
+                <option value="">Todas las categorías</option>
+            </select>
+            <select id="inv-filtro-estado" class="usu-input inv-select">
+                <option value="">Todos los estados</option>
+                <option value="1">Activos</option>
+                <option value="0">Inactivos</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- ── Tabla productos ──────────────────────────────── -->
+    <div class="stat-card dash-panel">
+        <div id="inv-skeleton">
+            <div class="dash-skeleton"></div>
+            <div class="dash-skeleton" style="width:85%"></div>
+            <div class="dash-skeleton" style="width:70%"></div>
+        </div>
+        <div id="inv-tabla" style="display:none">
+            <div class="usu-table-wrapper">
+                <table class="usu-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Stock</th>
+                            <th>Precio venta</th>
+                            <th class="inv-col-admin">P. compra</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inv-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+        <p id="inv-vacio" style="display:none;color:#7a8a9a;text-align:center;padding:2rem">
+            No hay productos registrados aún.
+        </p>
+    </div>
+
+</div>
+
+<!-- ══ MODAL — Crear / Editar producto ═════════════════ -->
+<div class="usu-modal-overlay" id="invModal" style="display:none">
+    <div class="usu-modal-card" style="max-width:600px">
+        <div class="usu-modal-header">
+            <h5 class="usu-modal-titulo" id="invModalTitulo">Nuevo producto</h5>
+            <button class="usu-modal-close" id="btnCerrarInvModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="usu-modal-body">
+            <div class="usu-form-row">
+                <div class="usu-form-group" style="grid-column:1/-1">
+                    <label>Nombre del producto *</label>
+                    <input type="text" id="inv-inp-nombre" class="usu-input" placeholder="Nombre">
+                </div>
+            </div>
+            <div class="usu-form-row">
+                <div class="usu-form-group">
+                    <label>Categoría *</label>
+                    <select id="inv-inp-categoria" class="usu-input">
+                        <option value="">Selecciona categoría</option>
+                    </select>
+                </div>
+                <div class="usu-form-group">
+                    <label>Proveedor</label>
+                    <select id="inv-inp-proveedor" class="usu-input">
+                        <option value="">Sin proveedor</option>
+                    </select>
+                </div>
+            </div>
+            <div class="usu-form-row">
+                <div class="usu-form-group">
+                    <label>Precio venta *</label>
+                    <input type="number" id="inv-inp-precio-venta" class="usu-input"
+                           placeholder="0.00" min="0" step="0.01">
+                </div>
+                <div class="usu-form-group">
+                    <label>Precio compra</label>
+                    <input type="number" id="inv-inp-precio-compra" class="usu-input"
+                           placeholder="0.00" min="0" step="0.01">
+                </div>
+            </div>
+            <div class="usu-form-row">
+                <div class="usu-form-group" id="inv-grupo-stock-inicial">
+                    <label>Stock inicial</label>
+                    <input type="number" id="inv-inp-stock" class="usu-input"
+                           placeholder="0" min="0">
+                </div>
+                <div class="usu-form-group">
+                    <label>Stock mínimo</label>
+                    <input type="number" id="inv-inp-stock-min" class="usu-input"
+                           placeholder="5" min="0">
+                </div>
+            </div>
+            <div class="usu-form-row">
+                <div class="usu-form-group">
+                    <label>Código de barras</label>
+                    <input type="text" id="inv-inp-codigo" class="usu-input"
+                           placeholder="Opcional">
+                </div>
+                <div class="usu-form-group">
+                    <label>Unidad de medida</label>
+                    <select id="inv-inp-unidad" class="usu-input">
+                        <option value="pieza">Pieza</option>
+                        <option value="kg">Kilogramo</option>
+                        <option value="litro">Litro</option>
+                        <option value="caja">Caja</option>
+                        <option value="paquete">Paquete</option>
+                        <option value="metro">Metro</option>
+                    </select>
+                </div>
+            </div>
+            <div class="usu-form-group">
+                <label>Descripción</label>
+                <textarea id="inv-inp-descripcion" class="usu-input"
+                          rows="2" placeholder="Opcional"
+                          style="resize:vertical"></textarea>
+            </div>
+            <p id="inv-modal-error"
+               style="display:none;color:#dc3545;font-size:.85rem;margin-top:.5rem"></p>
+        </div>
+        <div class="usu-modal-footer">
+            <button class="usu-btn-cancelar" id="btnCancelarInvModal">Cancelar</button>
+            <button class="usu-btn-guardar" id="btnGuardarProducto">
+                <i class="fas fa-save"></i> Guardar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ MODAL — Ajuste de stock ═════════════════════════ -->
+<div class="usu-modal-overlay" id="invModalAjuste" style="display:none">
+    <div class="usu-modal-card" style="max-width:420px">
+        <div class="usu-modal-header">
+            <h5 class="usu-modal-titulo">Ajuste de stock</h5>
+            <button class="usu-modal-close" id="btnCerrarAjusteModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="usu-modal-body">
+            <p id="inv-ajuste-producto"
+               style="font-weight:700;color:var(--color-pri);margin:0 0 1rem"></p>
+            <div class="usu-form-group">
+                <label>Tipo de movimiento</label>
+                <select id="inv-ajuste-tipo" class="usu-input">
+                    <option value="entrada">Entrada</option>
+                    <option value="salida">Salida</option>
+                    <option value="ajuste">Ajuste manual</option>
+                </select>
+            </div>
+            <div class="usu-form-group">
+                <label>Cantidad</label>
+                <input type="number" id="inv-ajuste-cantidad" class="usu-input"
+                       placeholder="0" min="1">
+            </div>
+            <div class="usu-form-group">
+                <label>Observaciones</label>
+                <input type="text" id="inv-ajuste-obs" class="usu-input"
+                       placeholder="Opcional">
+            </div>
+            <p id="inv-ajuste-error"
+               style="display:none;color:#dc3545;font-size:.85rem;margin-top:.5rem"></p>
+        </div>
+        <div class="usu-modal-footer">
+            <button class="usu-btn-cancelar" id="btnCancelarAjusteModal">Cancelar</button>
+            <button class="usu-btn-guardar" id="btnGuardarAjuste">
+                <i class="fas fa-check"></i> Aplicar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ MODAL — Movimientos ═════════════════════════════ -->
+<div class="usu-modal-overlay" id="invModalMovimientos" style="display:none">
+    <div class="usu-modal-card" style="max-width:700px">
+        <div class="usu-modal-header">
+            <h5 class="usu-modal-titulo">Movimientos de stock</h5>
+            <button class="usu-modal-close" id="btnCerrarMovModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="usu-modal-body" style="padding:1rem;max-height:60vh;overflow-y:auto">
+            <div id="mov-skeleton">
+                <div class="dash-skeleton"></div>
+                <div class="dash-skeleton" style="width:85%"></div>
+                <div class="dash-skeleton" style="width:70%"></div>
+            </div>
+            <div id="mov-lista"></div>
+            <p id="mov-vacio"
+               style="display:none;color:#7a8a9a;text-align:center;padding:2rem">
+                Sin movimientos registrados.
+            </p>
+        </div>
+        <div class="usu-modal-footer">
+            <button class="usu-btn-cancelar" id="btnCerrarMovModalFooter">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ MODAL — Gestión de categorías (solo admin) ══════ -->
+<div class="usu-modal-overlay" id="invModalCategorias" style="display:none">
+    <div class="usu-modal-card" style="max-width:540px">
+        <div class="usu-modal-header">
+            <h5 class="usu-modal-titulo">Gestión de categorías</h5>
+            <button class="usu-modal-close" id="btnCerrarCatModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="usu-modal-body" style="gap:0.75rem">
+
+            <!-- Formulario crear / editar -->
+            <div style="background:#f7f9fb;border-radius:10px;padding:1rem;border:1px solid #dce3ea">
+                <p id="cat-form-titulo"
+                   style="font-size:0.85rem;font-weight:700;color:var(--color-pri);margin:0 0 0.75rem">
+                    Nueva categoría
+                </p>
+                <div class="usu-form-row">
+                    <div class="usu-form-group">
+                        <label>Nombre *</label>
+                        <input type="text" id="cat-inp-nombre" class="usu-input"
+                               placeholder="Ej: Bebidas">
+                    </div>
+                    <div class="usu-form-group">
+                        <label>Descripción</label>
+                        <input type="text" id="cat-inp-descripcion" class="usu-input"
+                               placeholder="Opcional">
+                    </div>
+                </div>
+                <p id="cat-form-error"
+                   style="display:none;color:#dc3545;font-size:.82rem;margin:0.4rem 0 0"></p>
+                <div style="display:flex;gap:0.5rem;margin-top:0.75rem;justify-content:flex-end">
+                    <button class="usu-btn-cancelar" id="btnCancelarEditCat"
+                            style="display:none;padding:0.45rem 0.9rem;font-size:0.85rem">
+                        Cancelar edición
+                    </button>
+                    <button class="usu-btn-guardar" id="btnGuardarCat"
+                            style="padding:0.45rem 0.9rem;font-size:0.85rem">
+                        <i class="fas fa-plus" id="cat-btn-icon"></i>
+                        <span id="cat-btn-texto">Agregar</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Lista de categorías existentes -->
+            <div id="cat-lista-skeleton">
+                <div class="dash-skeleton"></div>
+                <div class="dash-skeleton" style="width:80%"></div>
+            </div>
+            <div id="cat-lista" style="max-height:280px;overflow-y:auto"></div>
+            <p id="cat-lista-vacio"
+               style="display:none;color:#7a8a9a;text-align:center;padding:1.5rem;font-size:0.9rem">
+                No hay categorías aún. ¡Crea la primera!
+            </p>
+
+        </div>
+        <div class="usu-modal-footer">
+            <button class="usu-btn-cancelar" id="btnCerrarCatModalFooter">Cerrar</button>
+        </div>
+    </div>
+</div>
