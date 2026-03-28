@@ -122,7 +122,7 @@ function initVentas() {
             transferencia: '-',
         };
 
-        tbody.innerHTML = ventas.map(v => `
+        tbody.innerHTML = ventas.map(v => ` 
             <tr id="ven-fila-${v.id_venta}">
                 <td>
                     <span style="font-weight:700;color:var(--color-pri);

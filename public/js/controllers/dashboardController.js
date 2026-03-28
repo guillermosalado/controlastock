@@ -1,7 +1,7 @@
 function initDashboard() {
     const token = localStorage.getItem('token');
 
-    // 🛑 GUARD: si no existe el DOM, no hacer nada
+    // si no existe el DOM, no hacer nada
     if (!document.getElementById('stat-ventas-hoy')) {
         return;
     }
@@ -140,10 +140,8 @@ function initDashboard() {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
-    // 🚀 INIT
     cargarDashboard();
 
-    // 🧹 DESTROY (por ahora vacío, pero necesario para arquitectura)
     return () => {
         console.log('DESTROY dashboard');
     };
